@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bassam Ultra‑Answer</title>
+  <script>
+    async function ask(mode="auto") {
+      const input = document.getElementById('q');
+      const out = document.getElementById('out');
+      const val = input.value.trim();
+      if (!val) { out.innerText = 'اكتب سؤالك…'; return; }
+      out.innerText = '⏳ يُفكِّر…';
+      try {
+        const r = await fetch('/api/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: val, mode })
+        });
+        const data = await r.json();
+        out.innerText = data.answer || '—';
+      } catch (e) {
+        out.innerText = 'حدث خطأ في الاتصال: ' + e;
+      }
+    }
+  </script>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;color:#e2e8f0;margin:0}
+    .card{width:min(820px,95vw);background:#111827;border:1px solid #1f2937;padding:18px 18px 12px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .title{font-weight:700;font-size:22px;margin-bottom:10px}
+    .row{display:flex;gap:10px;align-items:stretch}
+    textarea{flex:1;min-height:120px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:#e5e7eb;padding:12px;font-size:15px;outline:none}
+    .btns{display:flex;gap:8px;margin-top:10px}
+    button{border:1px solid #374151;background:#0ea5e9;color:white;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+    button.secondary{background:#475569}
+    .out{white-space:pre-wrap;background:#0b1220;border:1px solid #334155;border-radius:12px;padding:12px;min-height:140px;margin-top:12px}
+    .hint{opacity:.7;font-size:12px;margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="title">Bassam Ultra‑Answer</div>
+    <div class="row">
+      <textarea id="q" placeholder="اكتب سؤالك هنا… (يمكنك لصق روابط للتلخيص)"></textarea>
+    </div>
+    <div class="btns">
+      <button onclick="ask('auto')">إجابة</button>
+      <button class="secondary" onclick="ask('summarize')">تلخيص</button>
+      <button class="secondary" onclick="ask('code')">كود</button>
+    </div>
+    <div id="out" class="out"></div>
+    <div class="hint">تلميح: الصق أي رابط وسيجلب المحتوى ويلخصه قبل الإجابة.</div>
+  </div>
+</body>
+</html>
